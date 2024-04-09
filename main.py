@@ -1,7 +1,6 @@
 import os
 import torch
 import argparse
-from datetime import datetime
 
 from experiments.bb_forward import BBForward
 from experiments.finetune_layerscale import FinetuneLayerScale
@@ -26,11 +25,12 @@ if __name__ == '__main__':
     parser.add_argument('--save_model', action='store_true')
     parser.add_argument('--heads_path', default='./models/heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
+    parser.add_argument("--job_id", default='', type=str)
     
     parsed_args = parser.parse_args()
     
     # make directories
-    save_path = f'{parsed_args.results_path}/{parsed_args.exp_type}/{parsed_args.model_name}_{parsed_args.dataset_name}_{datetime.now().strftime("%Y%m%d-%H%M%S")}'
+    save_path = f'{parsed_args.results_path}/{parsed_args.exp_type}/{parsed_args.model_name}_{parsed_args.dataset_name}_{parsed_args.job_id}'
     os.makedirs(save_path, exist_ok=True)
     os.makedirs(parsed_args.heads_path, exist_ok=True)
     
