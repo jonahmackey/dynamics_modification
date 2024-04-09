@@ -30,9 +30,9 @@ if __name__ == '__main__':
     parsed_args = parser.parse_args()
     
     # make directories
-    save_path = f'{parser.results_path}/{parser.exp_type}/{parser.model_name}_{parser.dataset_name}_{datetime.now().strftime("%Y%m%d-%H%M%S")}'
+    save_path = f'{parsed_args.results_path}/{parsed_args.exp_type}/{parsed_args.model_name}_{parsed_args.dataset_name}_{datetime.now().strftime("%Y%m%d-%H%M%S")}'
     os.makedirs(save_path, exist_ok=True)
-    os.makedirs(parser.heads_path, exist_ok=True)
+    os.makedirs(parsed_args.heads_path, exist_ok=True)
     
     # experiment inputs
     args = {
@@ -47,17 +47,19 @@ if __name__ == '__main__':
         'print_every': parsed_args.print_every,
         'exp_type': parsed_args.exp_type,
         'save_model': parsed_args.save_model,
-        'heads_path': parser.heads_path,
+        'heads_path': parsed_args.heads_path,
         'save_path': save_path,
         'device': 'cuda' if torch.cuda.is_available() else 'cpu',
     }
     
+    print(args['device'])
+    
     # run experiment
-    if parser.exp_type == 'finetune-layerscale':
+    if parsed_args.exp_type == 'finetune-layerscale':
         exp = FinetuneLayerScale(args)
         exp.setup_experiment()
         exp.run()
-    elif parser.exp_type == 'bb-forward':
+    elif parsed_args.exp_type == 'bb-forward':
         exp = BBForward(args)
         exp.setup_experiment() 
         exp.run()

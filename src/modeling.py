@@ -4,7 +4,7 @@ import torch
 import open_clip
 from open_clip.transformer import LayerScale
 
-from bb_transformer import BBTransformer
+from src.bb_transformer import BBTransformer
 from src.datasets.templates import get_templates
 from src.datasets.classnames import get_classnames
 
