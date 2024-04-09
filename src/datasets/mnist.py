@@ -8,19 +8,6 @@ class MNIST:
                  location,
                  batch_size=128):
 
-        self.train_dataset = datasets.MNIST(
-            root=location,
-            download=False,
-            train=True,
-            transform=preprocess
-            )
-
-        self.train_loader = torch.utils.data.DataLoader(
-            self.train_dataset,
-            batch_size=batch_size,
-            shuffle=True
-            )
-
         self.test_dataset = datasets.MNIST(
             root=location,
             download=False,
@@ -31,7 +18,22 @@ class MNIST:
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
             batch_size=batch_size,
-            shuffle=False
+            shuffle=False,
+            drop_last=True
             )
+        
+        self.train_dataset = datasets.MNIST(
+            root=location,
+            download=False,
+            train=True,
+            transform=preprocess
+            )
+
+        self.train_loader = torch.utils.data.DataLoader(
+            self.train_dataset,
+            batch_size=batch_size,
+            shuffle=True,
+            drop_last=True
+        )
 
         self.classnames = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
