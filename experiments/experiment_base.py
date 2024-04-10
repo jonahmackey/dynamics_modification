@@ -16,7 +16,9 @@ class Experiment(ABC):
         self.setup_dataset()                
     
     def setup_model(self):
-        clip_model, _, preprocess = open_clip.create_model_and_transforms(self.model_name, pretrained='openai')
+        clip_model, _, preprocess = open_clip.create_model_and_transforms(self.model_name, 
+                                                                          pretrained='openai', 
+                                                                          cache_dir='/home/jmackey/.cache/clip')
         classification_head = get_classification_head(model=clip_model, 
                                                       model_name=self.model_name, 
                                                       dataset_name=self.dataset_name, 
