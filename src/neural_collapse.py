@@ -14,7 +14,6 @@ def compute_neural_collapse(image_encoder, data_loader, num_classes, device, gam
         examples_in_class = [0 for _ in range(num_classes)]
 
         for computation in ['Mean','Cov']:
-            print(f"Layer {l} {computation}")
             for _, (data, labels) in enumerate(data_loader, start=1):
                 data = data.to(device) # (B, 3, 224, 224)
 
@@ -74,6 +73,5 @@ def compute_neural_collapse(image_encoder, data_loader, num_classes, device, gam
         eigvec, eigval, _ = svds(Sb, k=num_classes-1)
         inv_Sb = eigvec @ np.diag(eigval**(-1)) @ eigvec.T
         Sw_invSb.append(np.trace(Sw @ inv_Sb) / num_classes)
-        print(Sw_invSb)
 
     return Sw_invSb

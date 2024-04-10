@@ -37,6 +37,7 @@ class Experiment(ABC):
                                    preprocess=self.preprocess, 
                                    location=self.data_path, 
                                    batch_size=self.batch_size)
+        self.num_epochs = 1 + self.num_iters // len(self.dataset.train_loader)
     
     def __getstate__(self):
         state = self.__dict__.copy()

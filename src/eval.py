@@ -1,5 +1,4 @@
 import torch
-import tqdm 
 
 
 def evaluate(model, data_loader, device):
@@ -7,7 +6,7 @@ def evaluate(model, data_loader, device):
 
     with torch.no_grad():
         correct, n = 0., 0.
-        for _, (data, labels) in enumerate(tqdm.tqdm(data_loader)):
+        for _, (data, labels) in enumerate(data_loader):
             # maybe dictionarize here? reference task arithmetic code 
             data = data.to(device)
             labels = labels.to(device)

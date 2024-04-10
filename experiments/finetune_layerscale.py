@@ -24,7 +24,7 @@ class FinetuneLayerScale(Experiment):
         
     def setup_optimization(self):
         # loss
-        self.loss_func = nn.CrossEntropyLoss(reduction='sum')
+        self.loss_func = nn.CrossEntropyLoss()
         
         # optimizer
         params = [p for p in self.model.parameters() if p.requires_grad]
@@ -41,8 +41,8 @@ class FinetuneLayerScale(Experiment):
         print('='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name}' + '='*30) 
         
         if self.save_model:
-            final_model_path = f'{self.save_path}/layerscale-ft_final.pt'
-            best_model_path = f'{self.save_path}/layerscale-ft_best.pt'
+            final_model_path = f'{self.results_path}/layerscale-ft_final.pt'
+            best_model_path = f'{self.results_path}/layerscale-ft_best.pt'
         
         # zeroshot accuracy
         print(f'\nEvaluating Zeroshot Accuracy...')
@@ -83,6 +83,7 @@ class FinetuneLayerScale(Experiment):
             print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{self.num_epochs}')
             
             # evaluation 
+            print(f'Evaluating...')
             test_accuracy = evaluate(model=self.model, 
                                 data_loader=self.dataset.test_loader, 
                                 device=self.device)
@@ -119,15 +120,15 @@ class FinetuneLayerScale(Experiment):
         stats = dict(stats, **self.__getstate__())
         
         # save results to CSV
-        with open(f'{self.save_path}/results.csv', 'w', newline='') as file:
+        with open(f'{self.results_path}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
             writer.writerow(stats)
-        print(f'\nSaved Results to {self.save_path}/results.csv')
+        print(f'\nSaved Results to {self.results_path}/results.csv')
         
         # save NC statistics to CSV
-        with open(f'{self.save_path}/NC_stats.csv', 'w', newline='') as file:
+        with open(f'{self.results_path}/NC_stats.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["Sw_invSb_zs", "Sw_invSb_ft"])
             writer.writerows(zip(Sw_invSb_zs, Sw_invSb_ft))
-        print(f'Saved NC Statistics to {self.save_path}/NC_stats.csv')
+        print(f'Saved NC Statistics to {self.results_path}/NC_stats.csv')

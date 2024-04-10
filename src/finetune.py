@@ -1,5 +1,4 @@
 import torch
-import tqdm
 
 
 def finetune_epoch(model, data_loader, loss_fn, optimizer, scheduler, meter, device, epoch, num_epochs, clip_grad_norm=True, print_every=100):
@@ -7,7 +6,7 @@ def finetune_epoch(model, data_loader, loss_fn, optimizer, scheduler, meter, dev
     model.train()
     meter.reset()
 
-    for i, (data, labels) in enumerate(tqdm.tqdm(data_loader)):
+    for i, (data, labels) in enumerate(data_loader):
         data = data.to(device)
         labels = labels.to(device)
         
@@ -23,7 +22,7 @@ def finetune_epoch(model, data_loader, loss_fn, optimizer, scheduler, meter, dev
 
         if clip_grad_norm:
             for param_group in optimizer.param_groups:
-                torch.nn.utils.clip_grad_norm_(param_group["params"], 1.0) # TODO: check if this is necessary
+                torch.nn.utils.clip_grad_norm_(param_group["params"], 1.0)
 
         optimizer.step()
 

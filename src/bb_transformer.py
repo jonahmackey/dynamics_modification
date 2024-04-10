@@ -55,11 +55,11 @@ class BBResidualBlock(nn.Module):
         delta_g = g0 - g1 # (S, B, E)
 
         if self.short_bb:
-            BB_step = (delta_x * delta_g).sum(dim=0, keepdim=True) / ((delta_g * delta_g).sum(dim=0, keepdim=True) + 1e-5) # (B, E)
+            BB_step = (delta_x * delta_g).sum(dim=(0, 2), keepdim=True) / ((delta_g * delta_g).sum(dim=(0, 2), keepdim=True) + 1e-5) # (B)
         else:
-            BB_step = (delta_x * delta_x).sum(dim=0, keepdim=True) / ((delta_x * delta_g).sum(dim=0, keepdim=True) + 1e-5) # (B, E)
+            BB_step = (delta_x * delta_x).sum(dim=(0, 2), keepdim=True) / ((delta_x * delta_g).sum(dim=(0, 2), keepdim=True) + 1e-5) # (B)
 
-        return BB_step.squeeze() # (B, E)
+        return BB_step.squeeze() # (B)
 
     def forward(self,
                 x1: torch.Tensor, # x1 shape: (S, B, E)
@@ -70,14 +70,14 @@ class BBResidualBlock(nn.Module):
         g1 = self.ls_1(self.attention(q_x=self.ln_1(x1))) # (S, B, E)
         g1_ = g1.detach() # (S, B, E)
 
-        gamma1 = self.gamma(x1_, g1_, x0, g0) # (B, E)
+        gamma1 = self.gamma(x1_, g1_, x0, g0) # (B)
         x2 = x1 + g1 * gamma1 # (S, B, E)
 
         x2_ = x2.detach() # (S, B, E)
         g2 = self.ls_2(self.mlp(self.ln_2(x2))) # (S, B, E)
         g2_ = g2.detach() # (S, B, E)
 
-        gamma2 = self.gamma(x2_, g2_, x1_, g1_) # (B, E)
+        gamma2 = self.gamma(x2_, g2_, x1_, g1_) # (B)
         x3 = x2 + g2 * gamma2 # (S, B, E)
 
         return x3, x2_, g2_ # (S, B, E), (S, B, E), (S, B, E)
