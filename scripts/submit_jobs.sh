@@ -18,7 +18,7 @@ do
         do
             SBATCH_COMMAND="/home/jmackey/scratch/dynamics_modification/scripts/single_job.sh \
                 ${MODEL_NAME} \
-                ${MODEL_NAME} \
+                ${DATASET_NAME} \
                 ${LR} \
                 ${EXPERIMENT_TYPE} \
                 /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
