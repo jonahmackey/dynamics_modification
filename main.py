@@ -50,6 +50,7 @@ if __name__ == '__main__':
         'heads_path': parsed_args.heads_path,
         'save_path': save_path,
         'device': 'cuda' if torch.cuda.is_available() else 'cpu',
+        'job_id': parsed_args.job_id
     }
     
     # run experiment
