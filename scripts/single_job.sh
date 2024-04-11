@@ -20,7 +20,7 @@ module load scipy-stack
 source /home/jmackey/dm/bin/activate
 echo "Job Array ID / Job ID: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
 
-python /home/jmackey/dynamics_modification/main.py \
+python /home/jmackey/scratch/dynamics_modification/main.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --data_path /home/jmackey/datasets \
