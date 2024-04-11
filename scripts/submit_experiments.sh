@@ -6,7 +6,7 @@ EXPERIMENT_TYPE=$2
 echo "Creating experiment directory /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 mkdir "/home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 
-MODEL_NAMES=( "ViT-B-32" "ViT-B-16" )
+MODEL_NAMES=( "ViT-B-32" "ViT-B-16" "ViT-L-14" )
 DATASET_NAMES=( "MNIST" )
 LR_VALS=( 0.01 )
 

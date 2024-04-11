@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --gpus-per-node=v100:1
 #SBATCH --mem=16G
-#SBATCH --time=0-02:00
+#SBATCH --time=0-03:00
 #SBATCH --account=def-papyan
 #SBATCH --mail-user=jonah.mackey@mail.utoronto.ca
 #SBATCH --mail-type=ALL
