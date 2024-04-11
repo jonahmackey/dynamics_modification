@@ -1,4 +1,5 @@
 import csv
+import sys
 import torch.nn as nn
 import torch.optim as optim
 
@@ -38,11 +39,10 @@ class FinetuneLayerScale(Experiment):
                                    steps=self.num_epochs * num_batches)
     
     def run(self):
-        print('='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name}' + '='*30) 
+        print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name}' + '='*30) 
         
         if self.save_model:
             final_model_path = f'{self.results_path}/layerscale-ft_final.pt'
-            best_model_path = f'{self.results_path}/layerscale-ft_best.pt'
         
         # zeroshot accuracy
         print(f'\nEvaluating Zeroshot Accuracy...')
@@ -50,6 +50,7 @@ class FinetuneLayerScale(Experiment):
                                      data_loader=self.dataset.test_loader, 
                                      device=self.device)
         print(f'Zeroshot Accuracy: {100 * zeroshot_accuracy:.2f}%')
+        sys.stdout.flush()
         
         # zeroshot NC statistics 
         print(f'\nComputing Zeroshot NC Statistics...')
@@ -58,6 +59,7 @@ class FinetuneLayerScale(Experiment):
                                               num_classes=len(self.dataset.classnames), 
                                               device=self.device)
         print(f'Done Computing Zeroshot NC Statistics')
+        sys.stdout.flush()
         
         # finetuning layerscale
         meter = AverageMeter() 
@@ -80,10 +82,10 @@ class FinetuneLayerScale(Experiment):
                                         print_every=self.print_every)
             
         
-            print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{self.num_epochs}')
+            print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch + 1}/{self.num_epochs}')
             
             # evaluation 
-            print(f'Evaluating...')
+            print(f'\nEvaluating...')
             test_accuracy = evaluate(model=self.model, 
                                 data_loader=self.dataset.test_loader, 
                                 device=self.device)
@@ -91,21 +93,20 @@ class FinetuneLayerScale(Experiment):
             # track best model performance
             if test_accuracy > best_test_accuracy:
                 best_test_accuracy = test_accuracy
-                best_test_epoch = epoch
+                best_test_epoch = epoch + 1
+            
                 
-                # save best model 
-                if self.save_model:
-                    self.model.save(best_model_path)
-                
-            print(f'\nTest Accuracy: {100 * test_accuracy:.2f}% (Best: {100 * best_test_accuracy:.2f}%) | Epoch: {epoch}/{self.num_epochs} (Best: {best_test_epoch}/{self.num_epochs})\n')
-        
+            print(f'Test Accuracy: {100 * test_accuracy:.2f}% (Best: {100 * best_test_accuracy:.2f}%) | Epoch: {epoch + 1}/{self.num_epochs} (Best: {best_test_epoch}/{self.num_epochs})\n')
+            sys.stdout.flush()
+            
         # compute finetuned NC statistics
         print(f'Computing Fine-tuned NC Statistics...')
         Sw_invSb_ft = compute_neural_collapse(image_encoder=self.model.image_encoder, 
                                               data_loader=self.dataset.test_loader, 
                                               num_classes=len(self.dataset.classnames), 
                                               device=self.device)
-        print(f'Done Computing Fine-tuned NC Statistics')
+        print(f'Done Computing Fine-tuned NC Statistics\n')
+        sys.stdout.flush()
         
         stats = {'zeroshot accuracy': zeroshot_accuracy,
                  'final_test_accuracy': test_accuracy,
@@ -114,8 +115,8 @@ class FinetuneLayerScale(Experiment):
         
         # save final model 
         if self.save_model:
-            self.model.save(best_model_path)
-            stats = dict(stats, **{'final_model_path': final_model_path, 'best_model_path': best_model_path})
+            self.model.save(final_model_path)
+            stats = dict(stats, **{'final_model_path': final_model_path})
         
         stats = dict(stats, **self.__getstate__())
         

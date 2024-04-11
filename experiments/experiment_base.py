@@ -47,7 +47,8 @@ class Experiment(ABC):
                       'dataset',
                       'loss_func',
                       'optimizer',
-                      'scheduler']
+                      'scheduler',
+                      'preprocess']
         
         for attr in attributes:
             try:
