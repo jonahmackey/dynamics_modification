@@ -144,14 +144,14 @@ def build_classification_head(model, dataset_name, device):
     return classification_head
 
 
-def get_classification_head(model, model_name, dataset_name, device, save_path):
-    head_path = save_path + f'/head_{dataset_name}.pt'
+def get_classification_head(model, dataset_name, device, heads_path):
+    head_path = heads_path + f'head_{dataset_name}.pt'
     
     if os.path.exists(head_path):
-        print(f'Classification head for {model_name} on {dataset_name} exists at {head_path}')
+        print(f'Classification head exists at {head_path}')
         return ClassificationHead.load(head_path)
     
-    print(f'Did not find classification head for {model_name} on {dataset_name} at {head_path}, building one from scratch.')
+    print(f'Did not find classification head at {head_path}, building one from scratch.')
     classification_head = build_classification_head(model, dataset_name, device)
     classification_head.save(head_path)
     

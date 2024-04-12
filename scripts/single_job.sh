@@ -31,6 +31,6 @@ python /home/jmackey/scratch/dynamics_modification/main.py \
     --print_every 100 \
     --exp_type ${EXPERIMENT_TYPE} \
     --save_model \
-    --heads_path /home/jmackey/scratch/dynamics_modification/models/heads \
+    --heads_path /home/jmackey/scratch/dynamics_modification/heads \
     --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}" 

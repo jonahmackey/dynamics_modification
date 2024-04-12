@@ -23,7 +23,7 @@ if __name__ == '__main__':
     
     parser.add_argument('--exp_type', default='finetune-layerscale', type=str)
     parser.add_argument('--save_model', action='store_true')
-    parser.add_argument('--heads_path', default='./models/heads', type=str)
+    parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
     parser.add_argument("--job_id", default='', type=str)
     
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         'print_every': parsed_args.print_every,
         'exp_type': parsed_args.exp_type,
         'save_model': parsed_args.save_model,
-        'heads_path': parsed_args.heads_path,
+        'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
         'device': 'cuda' if torch.cuda.is_available() else 'cpu',
         'job_id': parsed_args.job_id
