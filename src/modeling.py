@@ -17,7 +17,7 @@ class ImageClassifier(torch.nn.Module):
         self.classification_head = classification_head
         self.preprocess = preprocess
         
-    def add_ls_layer(self, device):
+    def init_gamma(self, device):
         embed_dim = self.image_encoder.transformer.width
         
         for resblock in self.image_encoder.transformer.resblocks:
@@ -26,9 +26,9 @@ class ImageClassifier(torch.nn.Module):
             resblock.ls_2 = LayerScale(embed_dim, init_values=1.0)
             resblock.ls_2.to(device)
             
-    def freeze_params_no_ls(self):
+    def freeze_params_no_gamma(self):
         for name, param in self.image_encoder.named_parameters():
-            if ('ls_1' in name) or ('ls_2' in name):
+            if 'gamma' in name:
                 param.requires_grad = True
             else:
                 param.requires_grad = False
@@ -63,6 +63,11 @@ class ImageClassifier(torch.nn.Module):
     def save(self, filename):
         print(f'Saving image classifier to {filename}')
         torch.save(self, filename)
+        
+    def save_gamma(self, filename):
+        print(f'Saving gamma to {filename}')
+        gamma_state_dict = {k: v for k, v in self.state_dict.items() if 'gamma' in k}
+        torch.save(gamma_state_dict, filename)
 
     @classmethod
     def load(cls, filename):
@@ -145,7 +150,7 @@ def build_classification_head(model, dataset_name, device):
 
 
 def get_classification_head(model, dataset_name, device, heads_path):
-    head_path = heads_path + f'head_{dataset_name}.pt'
+    head_path = heads_path + f'/head_{dataset_name}.pt'
     
     if os.path.exists(head_path):
         print(f'Classification head exists at {head_path}')

@@ -10,7 +10,7 @@ def finetune_epoch(model, data_loader, loss_fn, optimizer, scheduler, meter, dev
         data = data.to(device)
         labels = labels.to(device)
         
-        step = i + epoch * num_batches
+        step = i + (epoch - 1) * num_batches
         scheduler(step)
         optimizer.zero_grad()
 

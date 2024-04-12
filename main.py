@@ -1,9 +1,7 @@
-import os
 import torch
 import argparse
 
-from experiments.bb_forward import BBForward
-from experiments.finetune_layerscale import FinetuneLayerScale
+from experiments.gamma_finetuning import GammaFT
 
 
 if __name__ == '__main__':
@@ -22,7 +20,6 @@ if __name__ == '__main__':
     parser.add_argument('--print_every', default=100, type=int)
     
     parser.add_argument('--exp_type', default='finetune-layerscale', type=str)
-    parser.add_argument('--save_model', action='store_true')
     parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
     parser.add_argument("--job_id", default='', type=str)
@@ -41,7 +38,6 @@ if __name__ == '__main__':
         'clip_grad_norm': parsed_args.clip_grad_norm,
         'print_every': parsed_args.print_every,
         'exp_type': parsed_args.exp_type,
-        'save_model': parsed_args.save_model,
         'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
         'device': 'cuda' if torch.cuda.is_available() else 'cpu',
@@ -49,11 +45,9 @@ if __name__ == '__main__':
     }
     
     # run experiment
-    if parsed_args.exp_type == 'finetune-layerscale':
-        exp = FinetuneLayerScale(args)
+    if parsed_args.exp_type == 'gamma-ft':
+        exp = GammaFT(args)
         exp.setup_experiment()
         exp.run()
-    elif parsed_args.exp_type == 'bb-forward':
-        exp = BBForward(args)
-        exp.setup_experiment() 
-        exp.run()
+    else:
+        raise ValueError(f'Invalid experiment type: {parsed_args.exp_type}')

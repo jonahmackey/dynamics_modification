@@ -11,15 +11,15 @@ from src.neural_collapse import compute_neural_collapse
 from experiments.experiment_base import Experiment
 
 
-class FinetuneLayerScale(Experiment):
+class GammaFT(Experiment):
     def __init__(self, args) -> None:
         super().__init__(args)
         
     def setup_experiment(self):
         super().setup_experiment()
         
-        self.model.add_ls_layer(device=self.device)
-        self.model.freeze_params_no_ls()
+        self.model.init_gamma(device=self.device)
+        self.model.freeze_params_no_gamma()
         
         self.setup_optimization()
         
@@ -40,10 +40,7 @@ class FinetuneLayerScale(Experiment):
     
     def run(self):
         print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name}' + '='*30) 
-        
-        if self.save_model:
-            final_model_path = f'{self.results_path}/layerscale-ft_final.pt'
-        
+            
         # zeroshot accuracy
         print(f'\nEvaluating Zeroshot Accuracy...')
         zeroshot_accuracy = evaluate(model=self.model, 
@@ -67,7 +64,7 @@ class FinetuneLayerScale(Experiment):
         best_test_epoch = 0
         
         print(f'\nFine-tuning LayerScale...')
-        for epoch in range(self.num_epochs):
+        for epoch in range(1, self.num_epochs + 1):
             # finetuning epoch
             epoch_loss = finetune_epoch(model=self.model,
                                         data_loader=self.dataset.train_loader,
@@ -82,7 +79,7 @@ class FinetuneLayerScale(Experiment):
                                         print_every=self.print_every)
             
         
-            print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch + 1}/{self.num_epochs}')
+            print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{self.num_epochs}')
             
             # evaluation 
             print(f'\nEvaluating...')
@@ -93,10 +90,10 @@ class FinetuneLayerScale(Experiment):
             # track best model performance
             if test_accuracy > best_test_accuracy:
                 best_test_accuracy = test_accuracy
-                best_test_epoch = epoch + 1
+                best_test_epoch = epoch
             
                 
-            print(f'Test Accuracy: {100 * test_accuracy:.2f}% (Best: {100 * best_test_accuracy:.2f}%) | Epoch: {epoch + 1}/{self.num_epochs} (Best: {best_test_epoch}/{self.num_epochs})\n')
+            print(f'Test Accuracy: {100 * test_accuracy:.2f}% (Best: {100 * best_test_accuracy:.2f}%) | Epoch: {epoch}/{self.num_epochs} (Best: {best_test_epoch}/{self.num_epochs})\n')
             sys.stdout.flush()
             
         # compute finetuned NC statistics
@@ -108,19 +105,17 @@ class FinetuneLayerScale(Experiment):
         print(f'Done Computing Fine-tuned NC Statistics\n')
         sys.stdout.flush()
         
+        # save gammas 
+        self.model.save_gammas(self.results_path + '/gammas.pt')
+        
+        # save results to CSV
         stats = {'zeroshot accuracy': zeroshot_accuracy,
                  'final_test_accuracy': test_accuracy,
                  'best_test_accuracy': best_test_accuracy,
                  'best_test_epoch': best_test_epoch,}
         
-        # save final model 
-        if self.save_model:
-            self.model.save(final_model_path)
-            stats = dict(stats, **{'final_model_path': final_model_path})
-        
         stats = dict(stats, **self.__getstate__())
         
-        # save results to CSV
         with open(f'{self.results_path}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
