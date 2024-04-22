@@ -29,13 +29,13 @@ class Experiment(ABC):
                                      preprocess=preprocess)
         
         self.preprocess = preprocess
-        self.model.to(self.device)
         
     def setup_dataset(self):
         self.dataset = get_dataset(self.dataset_name, 
                                    preprocess=self.preprocess, 
                                    location=self.data_path, 
-                                   batch_size=self.batch_size)
+                                   batch_size=self.batch_size,
+                                   distributed=self.world_size > 1)
         self.num_epochs = 1 + self.num_iters // len(self.dataset.train_loader)
     
     def __getstate__(self):

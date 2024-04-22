@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 
 
@@ -41,6 +42,28 @@ class AverageMeter(Meter):
         self.sum = 0
         self.val = 0
         self.avg = 0
+        
+        
+class AccuracyMeter(Meter):
+    def __init__(self):
+        super(AccuracyMeter, self).__init__()
+        self.reset()
+    
+    def add(self, output, target, n=1):
+        pred = torch.argmax(output, dim=1).type(torch.int)
+        self.correct += (pred == target).type(torch.int).sum().item()
+        self.n += n
+      
+    def value(self):
+        if self.n == 0:
+            return np.nan
+      
+        else:
+            return 100 * (self.correct / max(self.n, 1))
+        
+    def reset(self):
+        self.correct = 0
+        self.n = 0
         
         
 def assign_learning_rate(param_group, new_lr):

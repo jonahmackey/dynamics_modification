@@ -17,14 +17,12 @@ class ImageClassifier(torch.nn.Module):
         self.classification_head = classification_head
         self.preprocess = preprocess
         
-    def init_gamma(self, device):
+    def init_gamma(self):
         embed_dim = self.image_encoder.transformer.width
         
         for resblock in self.image_encoder.transformer.resblocks:
             resblock.ls_1 = LayerScale(embed_dim, init_values=1.0)
-            resblock.ls_1.to(device)
             resblock.ls_2 = LayerScale(embed_dim, init_values=1.0)
-            resblock.ls_2.to(device)
             
     def freeze_params_no_gamma(self):
         for name, param in self.image_encoder.named_parameters():
@@ -36,7 +34,7 @@ class ImageClassifier(torch.nn.Module):
         self.classification_head.weight.requires_grad_(False)
         self.classification_head.bias.requires_grad_(False)
         
-    def add_bb_forward(self, device, short_bb=True):
+    def add_bb_forward(self, short_bb=True):
         state_dict = self.image_encoder.transformer.state_dict()
         
         width = self.image_encoder.transformer.width
@@ -50,7 +48,6 @@ class ImageClassifier(torch.nn.Module):
                                                        mlp_ratio=mlp_ratio,
                                                        short_bb=short_bb) 
         self.image_encoder.transformer.load_state_dict(state_dict, strict=False)
-        self.image_encoder.transformer.to(device)
         
     def forward(self, inputs):
         features = self.image_encoder(inputs)
@@ -108,14 +105,13 @@ class ClassificationHead(torch.nn.Linear):
         return torch.load(filename)
 
 
-def build_classification_head(model, dataset_name, device):    
+def build_classification_head(model, dataset_name):    
     templates = get_templates(dataset_name)
     classnames = get_classnames(dataset_name)
     
     logit_scale = model.logit_scale
 
     model.eval()
-    model.to(device)
 
     print('Building classification head.')
     with torch.no_grad():
@@ -127,7 +123,7 @@ def build_classification_head(model, dataset_name, device):
             for t in templates:
                 texts.append(t(classname))
                 
-            texts = open_clip.tokenize(texts).to(device) # tokenize
+            texts = open_clip.tokenize(texts).cuda() # tokenize
             embeddings = model.encode_text(texts) # embed with text encoder
             embeddings /= embeddings.norm(dim=-1, keepdim=True)
 
@@ -136,7 +132,7 @@ def build_classification_head(model, dataset_name, device):
 
             zeroshot_weights.append(embeddings)
 
-        zeroshot_weights = torch.stack(zeroshot_weights, dim=0).to(device)
+        zeroshot_weights = torch.stack(zeroshot_weights, dim=0).cuda()
         zeroshot_weights = torch.transpose(zeroshot_weights, 0, 2)
 
         zeroshot_weights *= logit_scale.exp()
@@ -149,7 +145,7 @@ def build_classification_head(model, dataset_name, device):
     return classification_head
 
 
-def get_classification_head(model, dataset_name, device, heads_path):
+def get_classification_head(model, dataset_name, heads_path):
     head_path = heads_path + f'/head_{dataset_name}.pt'
     
     if os.path.exists(head_path):
@@ -157,7 +153,7 @@ def get_classification_head(model, dataset_name, device, heads_path):
         return ClassificationHead.load(head_path)
     
     print(f'Did not find classification head at {head_path}, building one from scratch.')
-    classification_head = build_classification_head(model, dataset_name, device)
+    classification_head = build_classification_head(model, dataset_name)
     classification_head.save(head_path)
     
     return classification_head
