@@ -2,6 +2,7 @@ import os
 import csv
 import sys
 import open_clip
+from datetime import timedelta
 
 import torch
 import torch.nn as nn
@@ -29,7 +30,11 @@ class GammaFT(Experiment):
         torch.cuda.set_device(self.local_rank)
         
         print(f'From Rank: {self.rank}, ==> Initializing Process Group...')
-        dist.init_process_group(backend=self.dist_backend, init_method=self.init_method, world_size=self.world_size, rank=self.rank)
+        dist.init_process_group(backend=self.dist_backend, 
+                                init_method=self.init_method, 
+                                world_size=self.world_size, 
+                                rank=self.rank,
+                                timeout=timedelta(minutes=10))
         print("Process group ready!")
         
         print(f'From Rank: {self.rank}, ==> Initializing model..')
