@@ -1,4 +1,3 @@
-import torch
 import argparse
 
 from experiments.gamma_finetuning import GammaFT
@@ -22,11 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_type', default='finetune-layerscale', type=str)
     parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
-    
     parser.add_argument("--job_id", default='', type=str)
-    parser.add_argument("--init_method", default='', type=str)
-    parser.add_argument("--world_size", default=1, type=int)
-    parser.add_argument("--dist_backend", default='nccl', type=str)
     
     parsed_args = parser.parse_args()
     
@@ -45,9 +40,6 @@ if __name__ == '__main__':
         'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
         'job_id': parsed_args.job_id,
-        'init_method': parsed_args.init_method,
-        'world_size': parsed_args.world_size,
-        'dist_backend': parsed_args.dist_backend
     }
     
     # run experiment

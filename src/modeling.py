@@ -1,12 +1,21 @@
 import os
 
 import torch
+import torch.nn as nn
 import open_clip
-from open_clip.transformer import LayerScale
 
-from src.bb_transformer import BBTransformer
 from src.datasets.templates import get_templates
 from src.datasets.classnames import get_classnames
+
+
+class LayerScale(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.gamma = nn.Parameter(torch.ones(dim))
+        self.beta = nn.Parameter(torch.zeros(dim))
+
+    def forward(self, x):
+        return x * self.gamma + self.beta
 
 
 class ImageClassifier(torch.nn.Module):
@@ -17,14 +26,14 @@ class ImageClassifier(torch.nn.Module):
         self.classification_head = classification_head
         self.preprocess = preprocess
         
-    def init_gamma(self):
+    def init_ls(self):
         embed_dim = self.image_encoder.transformer.width
         
         for resblock in self.image_encoder.transformer.resblocks:
-            resblock.ls_1 = LayerScale(embed_dim, init_values=1.0)
-            resblock.ls_2 = LayerScale(embed_dim, init_values=1.0)
+            resblock.ls_1 = LayerScale(embed_dim)
+            resblock.ls_2 = LayerScale(embed_dim)
             
-    def freeze_params_no_gamma(self):
+    def freeze_param_subset(self): # TODO modify this so it can account for the different ft methods 
         for name, param in self.image_encoder.named_parameters():
             if 'gamma' in name:
                 param.requires_grad = True
@@ -33,21 +42,6 @@ class ImageClassifier(torch.nn.Module):
         
         self.classification_head.weight.requires_grad_(False)
         self.classification_head.bias.requires_grad_(False)
-        
-    def add_bb_forward(self, short_bb=True):
-        state_dict = self.image_encoder.transformer.state_dict()
-        
-        width = self.image_encoder.transformer.width
-        layers = self.image_encoder.transformer.layers
-        mlp_ratio = self.image_encoder.transformer.resblocks[0].mlp.c_fc.out_features // self.image_encoder.transformer.resblocks[0].mlp.c_fc.in_features
-        num_heads = self.image_encoder.transformer.resblocks[0].attn.num_heads
-        
-        self.image_encoder.transformer = BBTransformer(width=width, 
-                                                       layers=layers, 
-                                                       heads=num_heads,
-                                                       mlp_ratio=mlp_ratio,
-                                                       short_bb=short_bb) 
-        self.image_encoder.transformer.load_state_dict(state_dict, strict=False)
         
     def forward(self, inputs):
         features = self.image_encoder(inputs)

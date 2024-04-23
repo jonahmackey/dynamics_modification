@@ -33,13 +33,16 @@ class MNIST:
             )
         
         if distributed:
-            self.train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset)
+            self.train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset,
+                                                                                 shuffle=True,
+                                                                                 drop_last=True)
 
         self.train_loader = torch.utils.data.DataLoader(
             self.train_dataset,
             batch_size=batch_size,
             shuffle=(self.train_sampler is None),
             drop_last=True,
+            num_workers=0,
             sampler=self.train_sampler
         )
 

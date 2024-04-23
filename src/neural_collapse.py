@@ -3,7 +3,7 @@ import numpy as np
 from scipy.sparse.linalg import svds
 
 
-def compute_neural_collapse(image_encoder, data_loader, num_classes, device, gamma=False):
+def compute_neural_collapse(image_encoder, data_loader, num_classes, device):
     image_encoder.eval()
     num_resblocks = len(image_encoder.transformer.resblocks)
     Sw_invSb = []
@@ -30,15 +30,8 @@ def compute_neural_collapse(image_encoder, data_loader, num_classes, device, gam
                 x = x.permute(1, 0, 2)  # (S'', B, 768)  NLD -> LND
 
                 # get features at resblock layer l
-                if gamma:
-                    x, x0, g0 = image_encoder.transformer.resblocks[0](x)
-
-                    if l > 1:
-                        for r in image_encoder.transformer.resblocks[1:l]:
-                            x, x0, g0 = r(x, x0, g0)
-                else:
-                    for r in image_encoder.transformer.resblocks[:l]:
-                        x = r(x)
+                for r in image_encoder.transformer.resblocks[:l]:
+                    x = r(x)
                 h = x[0].detach().cpu() # (B, 768)
 
                 # compute mean and covariance

@@ -20,8 +20,7 @@ class Experiment(ABC):
                                                                           pretrained='openai', 
                                                                           cache_dir='/home/jmackey/.cache/clip')
         classification_head = get_classification_head(model=clip_model, 
-                                                      dataset_name=self.dataset_name, 
-                                                      device=self.device, 
+                                                      dataset_name=self.dataset_name,
                                                       heads_path=self.heads_path)
         
         self.model = ImageClassifier(image_encoder=clip_model.visual,
