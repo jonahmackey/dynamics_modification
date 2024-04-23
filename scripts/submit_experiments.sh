@@ -1,7 +1,7 @@
 #!/bin/bash
 
-EXPERIMENT_TITLE=$1
-EXPERIMENT_TYPE=$2
+EXPERIMENT_TYPE=$1
+EXPERIMENT_TITLE=$2
 
 echo "Creating experiment directory /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 mkdir "/home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
