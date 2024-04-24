@@ -57,7 +57,7 @@ def run_experiment(rank, args):
                           steps=num_epochs * num_batches)
     
     ### Fine-tuning Loop ###
-    print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {args['model_name']} | Dataset: {args['dataset_name']}' + '='*30) 
+    print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {args["model_name"]} | Dataset: {args["dataset_name"]}' + '='*30) 
             
     # zeroshot accuracy
     if rank == 0:
@@ -117,11 +117,11 @@ def run_experiment(rank, args):
         
         stats = dict(stats, **args)
         
-        with open(f'{args['results_path']}/results.csv', 'w', newline='') as file:
+        with open(f'{args["results_path"]}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
             writer.writerow(stats)
-        print(f'\nSaved Results to {args['results_path']}/results.csv')
+        print(f'\nSaved Results to {args["results_path"]}/results.csv')
         
     dist.barrier()
     dist.destroy_process_group()
