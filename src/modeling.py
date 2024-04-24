@@ -8,6 +8,18 @@ from src.datasets.templates import get_templates
 from src.datasets.classnames import get_classnames
 
 
+ft_method_to_key = {
+    'ln_ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta', 'ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
+    'ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta'],
+    'ls_gamma': ['ls_1.gamma', 'ls_2.gamma'],
+    'ls_beta': ['ls_1.beta', 'ls_2.beta'],
+    'ln': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
+    'ln_weight': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight'],
+    'ln_bias': ['ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
+    'bitfit': ['bias']
+}
+
+
 class LayerScale(nn.Module):
     def __init__(self, dim):
         super().__init__()
@@ -19,12 +31,17 @@ class LayerScale(nn.Module):
 
 
 class ImageClassifier(torch.nn.Module):
-    def __init__(self, image_encoder, classification_head, preprocess):
+    def __init__(self, image_encoder, classification_head, preprocess, ft_method='full'):
         super().__init__()
         
         self.image_encoder = image_encoder
         self.classification_head = classification_head
         self.preprocess = preprocess
+        self.ft_method = ft_method
+        
+        if not (ft_method == 'full'):
+            self.init_ls()
+        self.freeze_param_subset()
         
     def init_ls(self):
         embed_dim = self.image_encoder.transformer.width
@@ -33,15 +50,18 @@ class ImageClassifier(torch.nn.Module):
             resblock.ls_1 = LayerScale(embed_dim)
             resblock.ls_2 = LayerScale(embed_dim)
             
-    def freeze_param_subset(self): # TODO modify this so it can account for the different ft methods 
-        for name, param in self.image_encoder.named_parameters():
-            if 'gamma' in name:
-                param.requires_grad = True
-            else:
+    def freeze_param_subset(self): 
+        if not (self.ft_method == 'full'):
+            for name, param in self.image_encoder.named_parameters():
                 param.requires_grad = False
+                
+                for id in ft_method_to_key[self.ft_method]:
+                    if name.endswith(id):
+                        param.requires_grad = True
+                        break
         
-        self.classification_head.weight.requires_grad_(False)
-        self.classification_head.bias.requires_grad_(False)
+        self.classification_head.weight.requires_grad = False
+        self.classification_head.bias.requires_grad = False
         
     def forward(self, inputs):
         features = self.image_encoder(inputs)

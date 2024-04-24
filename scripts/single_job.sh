@@ -9,7 +9,7 @@
 MODEL_NAME=$1
 DATASET_NAME=$2
 LR=$3
-EXPERIMENT_TYPE=$4
+FT_METHOD=$4
 RESULTS_PATH=$5
 
 mkdir "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}"
@@ -28,7 +28,7 @@ python /home/jmackey/scratch/dynamics_modification/main.py \
     --num_iters 1000 \
     --warmup_steps 200 \
     --print_every 100 \
-    --exp_type ${EXPERIMENT_TYPE} \
+    --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
     --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}"

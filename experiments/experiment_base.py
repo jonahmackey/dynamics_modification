@@ -25,7 +25,8 @@ class Experiment(ABC):
         
         self.model = ImageClassifier(image_encoder=clip_model.visual,
                                      classification_head=classification_head,
-                                     preprocess=preprocess)
+                                     preprocess=preprocess,
+                                     ft_method=self.ft_method)
         
         self.preprocess = preprocess
         

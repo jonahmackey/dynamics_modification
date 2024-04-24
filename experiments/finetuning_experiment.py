@@ -19,8 +19,6 @@ class FinetuningExperiment(Experiment):
     def setup_experiment(self):
         super.setup_experiment()
         
-        self.model.init_ls()
-        self.model.freeze_param_subset()
         self.model.cuda()
         
         self.setup_optimization()

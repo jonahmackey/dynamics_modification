@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('--clip_grad_norm', action='store_true')
     parser.add_argument('--print_every', default=100, type=int)
     
-    parser.add_argument('--ft_method', default='gamma', type=str)
+    parser.add_argument('--ft_method', default='ls_gamma', type=str)
     parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
     parser.add_argument("--job_id", default='', type=str)
