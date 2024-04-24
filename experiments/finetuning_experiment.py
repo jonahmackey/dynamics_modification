@@ -83,8 +83,7 @@ class FinetuningExperiment(Experiment):
             
             # evaluation 
             print(f'\nEvaluating...')
-            test_accuracy = evaluate(model=self.model, 
-                                data_loader=self.dataset.test_loader)
+            test_accuracy = evaluate(model=self.model, data_loader=self.dataset.test_loader)
                 
             print(f'Test Accuracy: {100 * test_accuracy:.2f}% | Epoch: {epoch}/{self.num_epochs}\n')
             sys.stdout.flush()
@@ -99,11 +98,11 @@ class FinetuningExperiment(Experiment):
         sys.stdout.flush()
         
         # save gammas 
-        self.model.save_gamma(self.results_path + '/gammas.pt')
+        self.model.save_params(self.results_path + '/model_params.pt')
         
         # save results to CSV
         stats = {'zeroshot_accuracy': zeroshot_accuracy,
-                    'final_test_accuracy': test_accuracy}
+                 'final_test_accuracy': test_accuracy}
         
         stats = dict(stats, **self.__getstate__())
         

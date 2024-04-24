@@ -75,10 +75,20 @@ class ImageClassifier(torch.nn.Module):
         print(f'Saving image classifier to {filename}')
         torch.save(self, filename)
         
-    def save_gamma(self, filename):
-        print(f'Saving gamma to {filename}')
-        gamma_state_dict = {k: v for k, v in self.state_dict.items() if 'gamma' in k}
-        torch.save(gamma_state_dict, filename)
+    def save_params(self, filename):
+        print(f'Saving model parameters to {filename}') 
+        params_state_dict = {}
+        
+        if self.ft_method == 'full':
+            params_state_dict = self.image_encoder.state_dict()
+        else:
+            for name in self.image_encoder.state_dict():
+                for id in ft_method_to_key[self.ft_method]:
+                    if name.endswith(id):
+                        params_state_dict[name] = self.image_encoder.state_dict()[name]
+                        break
+                    
+        torch.save(params_state_dict, filename)
 
     @classmethod
     def load(cls, filename):
