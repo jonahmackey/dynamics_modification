@@ -2,7 +2,8 @@ import torch
 import torchvision.datasets as datasets
 from src.datasets.classnames import get_classnames
 
-class SVHN:
+
+class CIFAR10:
     def __init__(self,
                  preprocess,
                  location,
@@ -11,10 +12,10 @@ class SVHN:
 
         self.train_sampler = None
         
-        self.test_dataset = datasets.SVHN(
+        self.test_dataset = datasets.CIFAR10(
             root=location,
             download=False,
-            split='test',
+            train=False,
             transform=preprocess
             )
 
@@ -25,10 +26,10 @@ class SVHN:
             drop_last=True
             )
         
-        self.train_dataset = datasets.SVHN(
+        self.train_dataset = datasets.CIFAR10(
             root=location,
             download=False,
-            split='train',
+            train=True,
             transform=preprocess
             )
         
@@ -46,4 +47,4 @@ class SVHN:
             sampler=self.train_sampler
         )
 
-        self.classnames = get_classnames('SVHN')
+        self.classnames = get_classnames('CIFAR10')

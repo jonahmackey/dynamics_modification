@@ -1,12 +1,12 @@
 import torch
 import torchvision.datasets as datasets
-
+from src.datasets.classnames import get_classnames
 
 class MNIST:
     def __init__(self,
                  preprocess,
                  location,
-                 batch_size=12,
+                 batch_size=128,
                  distributed=False):
 
         self.train_sampler = None
@@ -46,4 +46,4 @@ class MNIST:
             sampler=self.train_sampler
         )
 
-        self.classnames = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        self.classnames = get_classnames('MNIST')
