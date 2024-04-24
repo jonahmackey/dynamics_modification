@@ -33,8 +33,7 @@ class Experiment(ABC):
         self.dataset = get_dataset(self.dataset_name, 
                                    preprocess=self.preprocess, 
                                    location=self.data_path, 
-                                   batch_size=self.batch_size,
-                                   distributed=self.world_size > 1)
+                                   batch_size=self.batch_size)
         self.num_epochs = 1 + self.num_iters // len(self.dataset.train_loader)
     
     def __getstate__(self):
