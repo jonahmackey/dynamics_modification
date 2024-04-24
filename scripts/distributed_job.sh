@@ -4,7 +4,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=v100:2
-#SBATCH --tasks-per-node=2
+#SBATCH --tasks-per-node=1
 #SBATCH --mem=16G
 #SBATCH --time=0-03:00
 
@@ -19,7 +19,6 @@ module load python/3.10
 module load scipy-stack
 source /home/jmackey/dm/bin/activate
 
-export NCCL_BLOCKING_WAIT=1
 echo "Job Array ID / Job ID: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
 
 python /home/jmackey/scratch/dynamics_modification/main_dist.py \
