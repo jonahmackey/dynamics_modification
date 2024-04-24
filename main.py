@@ -16,6 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_iters', default=1000, type=int)
     parser.add_argument('--warmup_steps', default=0, type=int)
     parser.add_argument('--clip_grad_norm', action='store_true')
+    parser.add_argument('--weight_decay', default=0.0, type=float)
     parser.add_argument('--print_every', default=100, type=int)
     
     parser.add_argument('--ft_method', default='ls_gamma', type=str)
@@ -34,6 +35,7 @@ if __name__ == '__main__':
         'batch_size': parsed_args.batch_size,
         'num_iters': parsed_args.num_iters,
         'warmup_steps': parsed_args.warmup_steps,
+        'weight_decay': parsed_args.weight_decay,
         'clip_grad_norm': parsed_args.clip_grad_norm,
         'print_every': parsed_args.print_every,
         'ft_method': parsed_args.ft_method,

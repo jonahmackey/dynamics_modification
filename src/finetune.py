@@ -5,8 +5,8 @@ def finetune_epoch(model, data_loader, loss_fn, optimizer, scheduler, meters, ep
     num_batches = len(data_loader)
     model.train()
     
-    for meter in meters:
-        meter.reset()
+    for key in meters:
+        meters[key].reset()
 
     for i, (data, labels) in enumerate(data_loader):
         data = data.cuda()

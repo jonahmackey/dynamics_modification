@@ -29,7 +29,7 @@ class FinetuningExperiment(Experiment):
         
         # optimizer
         params = [p for p in self.model.parameters() if p.requires_grad]
-        self.optimizer = optim.AdamW(params, lr=self.lr)
+        self.optimizer = optim.AdamW(params, lr=self.lr, weight_decay=self.weight_decay)
         
         # scheduler
         num_batches = len(self.dataset.train_loader)
