@@ -22,7 +22,7 @@ source /home/jmackey/dm/bin/activate
 export NCCL_BLOCKING_WAIT=1
 echo "Job Array ID / Job ID: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
 
-python /home/jmackey/scratch/dynamics_modification/experiments/distributed_finetuning.py \
+python /home/jmackey/scratch/dynamics_modification/main_dist.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
     --data_path /home/jmackey/datasets \
