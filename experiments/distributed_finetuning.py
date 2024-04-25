@@ -18,9 +18,10 @@ from src.datasets.registry import get_dataset
 
 
 def run_experiment(rank, args):
+    torch.cuda.set_device(rank)
     
     # init process group
-    print(f'From Rank: {rank}, ==> Initializing Process Group...')
+    print(f'From Rank: {rank} ==> Initializing Process Group...')
     setup_processes(world_size=args['world_size'], rank=rank)
     print('Process group ready!')
     sys.stdout.flush()
@@ -126,13 +127,15 @@ def run_experiment(rank, args):
     
     
 def setup_processes(world_size, rank):
+    print("Rank: ", rank)
+    print("World Size: ", world_size)
+    
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
     
     dist.init_process_group(backend='nccl', 
                             world_size=world_size, 
-                            rank=rank,
-                            timeout=timedelta(minutes=10))
+                            rank=rank)
     
     
 def setup_model(args):

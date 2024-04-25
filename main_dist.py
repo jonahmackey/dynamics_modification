@@ -36,7 +36,7 @@ if __name__ == '__main__':
         'dataset_name': parsed_args.dataset_name,
         'data_path': parsed_args.data_path,
         'lr': parsed_args.lr,
-        'batch_size': parsed_args.batch_size,
+        'batch_size': parsed_args.batch_size // parsed_args.world_size,
         'num_iters': parsed_args.num_iters,
         'warmup_steps': parsed_args.warmup_steps,
         'clip_grad_norm': parsed_args.clip_grad_norm,
@@ -48,4 +48,4 @@ if __name__ == '__main__':
         'world_size': parsed_args.world_size,
     }
     
-    mp.spawn(run_experiment, args=(args,))
+    mp.spawn(run_experiment, args=(args,), nprocs=args['world_size'])

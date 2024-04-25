@@ -32,5 +32,5 @@ python /home/jmackey/scratch/dynamics_modification/main.py \
     --print_every 100 \
     --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
-    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}" \
+    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}"
