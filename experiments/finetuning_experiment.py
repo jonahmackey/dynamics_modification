@@ -7,6 +7,7 @@ import torch.optim as optim
 from src.eval import evaluate 
 from src.finetune import finetune_epoch
 from src.utils import cosine_lr, AverageMeter, AccuracyMeter
+from src.neural_collapse import compute_neural_collapse
 
 from experiments.experiment_base import Experiment
 
@@ -79,7 +80,17 @@ class FinetuningExperiment(Experiment):
             print(f'Test Accuracy: {100 * test_accuracy:.2f}% | Epoch: {epoch}/{self.num_epochs}\n')
             sys.stdout.flush()
         
-        # save gammas 
+        # compute finetuned NC statistics
+        print(f'Computing Fine-tuned NC Statistics...')
+        Sw_invSb = compute_neural_collapse(image_encoder=self.model.image_encoder, 
+                                           data_loader=self.dataset.test_loader, 
+                                           num_classes=len(self.dataset.classnames))
+        print(f'Done Computing Fine-tuned NC Statistics\n')
+        sys.stdout.flush()
+        
+        nc_dict = {f'Sw_invSb {i + 1}': Sw_invSb[i] for i in range(len(Sw_invSb))}
+        
+        # save model params
         self.model.save_params(self.results_path + '/model_params.pt')
         
         # save results to CSV
@@ -87,10 +98,10 @@ class FinetuningExperiment(Experiment):
                  'final_test_accuracy': test_accuracy}
         
         stats = dict(stats, **self.__getstate__())
+        stats = dict(stats, **self.nc_dict)
         
         with open(f'{self.results_path}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
             writer.writerow(stats)
         print(f'\nSaved Results to {self.results_path}/results.csv')
-        
