@@ -9,8 +9,12 @@ class CIFAR100:
                  location,
                  batch_size=128,
                  distributed=False):
-
-        self.train_sampler = None
+        
+        location = location + '/CIFAR100'
+        
+        test_batch_size = batch_size
+        if distributed:
+            test_batch_size = 32
         
         self.test_dataset = datasets.CIFAR100(
             root=location,
@@ -21,7 +25,7 @@ class CIFAR100:
 
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
-            batch_size=32,
+            batch_size=test_batch_size,
             shuffle=False,
             drop_last=True
             )
@@ -33,6 +37,7 @@ class CIFAR100:
             transform=preprocess
             )
         
+        self.train_sampler = None
         if distributed:
             self.train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset,
                                                                                  shuffle=True,

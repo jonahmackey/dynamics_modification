@@ -22,11 +22,13 @@ echo "Job Array ID / Job ID: $SLURM_ARRAY_JOB_ID / $SLURM_JOB_ID"
 python /home/jmackey/scratch/dynamics_modification/main.py \
     --model_name ${MODEL_NAME} \
     --dataset_name ${DATASET_NAME} \
-    --data_path /home/jmackey/datasets \
+    --data_path /home/jmackey/scratch/dynamics_modification/datasets \
     --lr ${LR} \
     --batch_size 128 \
-    --num_iters 1000 \
+    --num_iters 2000 \
     --warmup_steps 200 \
+    --weight_decay 0.1 \
+    --clip_grad_norm \
     --print_every 100 \
     --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \

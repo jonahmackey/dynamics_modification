@@ -8,8 +8,12 @@ class SVHN:
                  location,
                  batch_size=128,
                  distributed=False):
+        
+        location = location + '/SVHN'
 
-        self.train_sampler = None
+        test_batch_size = batch_size
+        if distributed:
+            test_batch_size = 32
         
         self.test_dataset = datasets.SVHN(
             root=location,
@@ -20,7 +24,7 @@ class SVHN:
 
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
-            batch_size=32,
+            batch_size=test_batch_size,
             shuffle=False,
             drop_last=True
             )
@@ -32,6 +36,7 @@ class SVHN:
             transform=preprocess
             )
         
+        self.train_sampler = None
         if distributed:
             self.train_sampler = torch.utils.data.distributed.DistributedSampler(self.train_dataset,
                                                                                  shuffle=True,

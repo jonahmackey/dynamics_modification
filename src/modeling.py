@@ -135,6 +135,7 @@ def build_classification_head(model, dataset_name):
     
     logit_scale = model.logit_scale
 
+    model.cuda()
     model.eval()
 
     print('Building classification head.')
