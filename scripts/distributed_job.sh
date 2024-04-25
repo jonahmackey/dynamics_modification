@@ -4,17 +4,17 @@
 #SBATCH --mail-type=ALL
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=v100:2
-#SBATCH --tasks-per-node=1
+#SBATCH --ntasks-per-node=1
 #SBATCH --mem=16G
-#SBATCH --time=0-03:00
+#SBATCH --time=0-00:30
 
 MODEL_NAME=$1
 DATASET_NAME=$2
 LR=$3
-EXPERIMENT_TYPE=$4
+FT_METHOD=$4
 RESULTS_PATH=$5
 
-mkdir "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}"
+mkdir "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}"
 module load python/3.10
 module load scipy-stack
 source /home/jmackey/dm/bin/activate
@@ -30,8 +30,8 @@ python /home/jmackey/scratch/dynamics_modification/main_dist.py \
     --num_iters 1000 \
     --warmup_steps 200 \
     --print_every 100 \
-    --exp_type ${EXPERIMENT_TYPE} \
+    --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
-    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_lr=${LR}_${SLURM_JOB_ID}" \
+    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD_}lr=${LR}_id=${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}" \
-    --world_size $((SLURM_NTASKS_PER_NODE * SLURM_JOB_NUM_NODES))
+    --world_size 2

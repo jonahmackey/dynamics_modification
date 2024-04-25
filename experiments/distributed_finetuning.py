@@ -27,8 +27,6 @@ def run_experiment(rank, args):
     
     # setup model 
     model, preprocess = setup_model(args)
-    model.init_ls()
-    model.freeze_param_subset()
     model.to(rank)
     model = torch.nn.parallel.DistributedDataParallel(model, 
                                                       device_ids=[rank],
@@ -107,7 +105,7 @@ def run_experiment(rank, args):
     # saving results
     if rank == 0:
         # save gammas 
-        model.module.save_gamma(args['results_path'] + '/gammas.pt')
+        model.module.save_params(args['results_path'] + '/model_params.pt')
         
         # save results to CSV
         stats = {'zeroshot_accuracy': zeroshot_accuracy,
@@ -144,7 +142,8 @@ def setup_model(args):
                                                   heads_path=args['heads_path'])
     model = ImageClassifier(image_encoder=clip_model.visual,
                             classification_head=classification_head,
-                            preprocess=preprocess)
+                            preprocess=preprocess,
+                            ft_method=args['ft_method'])
     
     return model, preprocess
         

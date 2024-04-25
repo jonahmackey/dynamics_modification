@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--clip_grad_norm', action='store_true')
     parser.add_argument('--print_every', default=100, type=int)
     
-    parser.add_argument('--exp_type', default='finetune-layerscale', type=str)
+    parser.add_argument('--ft_method', default='ls_gamma', type=str)
     parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
     
@@ -41,7 +41,7 @@ if __name__ == '__main__':
         'warmup_steps': parsed_args.warmup_steps,
         'clip_grad_norm': parsed_args.clip_grad_norm,
         'print_every': parsed_args.print_every,
-        'exp_type': parsed_args.exp_type,
+        'ft_method': parsed_args.ft_method,
         'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
         'job_id': parsed_args.job_id,
