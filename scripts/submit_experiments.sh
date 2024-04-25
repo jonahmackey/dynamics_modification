@@ -1,13 +1,13 @@
 #!/bin/bash
 
-EXPERIMENT_TITLE=$2
+EXPERIMENT_TITLE=$1
 
 echo "Creating experiment directory /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 mkdir "/home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 
-MODEL_NAMES=( "ViT-L-14" )
-DATASET_NAMES=( "MNIST" )
-LR_VALS=( 0.01 )
+MODEL_NAMES=( "ViT-B-32" "ViT-B-16" )
+DATASET_NAMES=( "MNIST" "SVHN" "CIFAR10" "CIFAR100" )
+LR_VALS=( 1e-5 )
 FT_METHODS=( "full" )
 
 for MODEL_NAME in "${MODEL_NAMES[@]}";
@@ -22,7 +22,7 @@ do
                     ${MODEL_NAME} \
                     ${DATASET_NAME} \
                     ${LR} \
-                    ${EXPERIMENT_TYPE} \
+                    ${FT_METHOD} \
                     /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
                 echo "Running sbatch command ${SBATCH_COMMAND}"
                 sbatch ${SBATCH_COMMAND}
@@ -31,6 +31,6 @@ do
     done
 done
 
-echo "${EXPERIMENT_TYPE} experiments submitted!"
+echo "Experiments submitted!"
             
 

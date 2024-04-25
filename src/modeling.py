@@ -9,13 +9,13 @@ from src.datasets.classnames import get_classnames
 
 
 ft_method_to_key = {
-    'ln_ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta', 'ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
+    'ln-ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta', 'ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
     'ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta'],
-    'ls_gamma': ['ls_1.gamma', 'ls_2.gamma'],
-    'ls_beta': ['ls_1.beta', 'ls_2.beta'],
+    'ls-gamma': ['ls_1.gamma', 'ls_2.gamma'],
+    'ls-beta': ['ls_1.beta', 'ls_2.beta'],
     'ln': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
-    'ln_weight': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight'],
-    'ln_bias': ['ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
+    'ln-weight': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight'],
+    'ln-bias': ['ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
     'bitfit': ['bias']
 }
 
@@ -135,6 +135,7 @@ def build_classification_head(model, dataset_name):
     
     logit_scale = model.logit_scale
 
+    model.cuda()
     model.eval()
 
     print('Building classification head.')

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.sparse.linalg import svds
 
 
-def compute_neural_collapse(image_encoder, data_loader, num_classes, device):
+def compute_neural_collapse(image_encoder, data_loader, num_classes):
     image_encoder.eval()
     num_resblocks = len(image_encoder.transformer.resblocks)
     Sw_invSb = []
@@ -15,7 +15,7 @@ def compute_neural_collapse(image_encoder, data_loader, num_classes, device):
 
         for computation in ['Mean','Cov']:
             for _, (data, labels) in enumerate(data_loader, start=1):
-                data = data.to(device) # (B, 3, 224, 224)
+                data = data.cuda() # (B, 3, 224, 224)
 
                 # feed data through model up until transformer
                 x = image_encoder.conv1(data) # (B, 768, S, S) where S = 224 / patchsize = 16

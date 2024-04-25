@@ -1,7 +1,12 @@
 from src.datasets.mnist import MNIST
 from src.datasets.svhn import SVHN
+from src.datasets.cifar10 import CIFAR10
+from src.datasets.cifar100 import CIFAR100
 
-registry = {'MNIST': MNIST, 'SVHN': SVHN}
+registry = {'MNIST': MNIST, 
+            'SVHN': SVHN, 
+            'CIFAR10': CIFAR10,
+            'CIFAR100': CIFAR100}
 
 
 def get_dataset(dataset_name, preprocess, location, batch_size=128, distributed=False):
