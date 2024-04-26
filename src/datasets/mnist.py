@@ -8,10 +8,6 @@ class MNIST:
                  location,
                  batch_size=128,
                  distributed=False):
-
-        test_batch_size = batch_size
-        if distributed:
-            test_batch_size = 32
         
         self.test_dataset = datasets.MNIST(
             root=location,
@@ -22,7 +18,7 @@ class MNIST:
 
         self.test_loader = torch.utils.data.DataLoader(
             self.test_dataset,
-            batch_size=test_batch_size,
+            batch_size=batch_size,
             shuffle=False,
             drop_last=True
             )
