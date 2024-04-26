@@ -55,15 +55,6 @@ def run_experiment(rank, args):
     
     ### Fine-tuning Loop ###
     print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {args["model_name"]} | Dataset: {args["dataset_name"]}' + '='*30) 
-            
-    # zeroshot accuracy
-    if rank == 0:
-        print(f'\nEvaluating Zeroshot Accuracy...')
-        zeroshot_accuracy = evaluate(model=model, 
-                                     data_loader=dataset.test_loader)
-        print(f'Zeroshot Accuracy: {100 * zeroshot_accuracy:.2f}%')
-        sys.stdout.flush()
-    dist.barrier()
         
     # finetuning
     meters = {
@@ -109,9 +100,7 @@ def run_experiment(rank, args):
         model.module.save_params(args['results_path'] + '/model_params.pt')
         
         # save results to CSV
-        stats = {'zeroshot_accuracy': zeroshot_accuracy,
-                 'final_test_accuracy': test_accuracy}
-        
+        stats = {'accuracy': test_accuracy}
         stats = dict(stats, **args)
         
         with open(f'{args["results_path"]}/results.csv', 'w', newline='') as file:

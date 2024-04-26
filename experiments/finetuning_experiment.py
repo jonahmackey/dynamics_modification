@@ -40,13 +40,6 @@ class FinetuningExperiment(Experiment):
     
     def run(self):
         print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name} | FT METHOD {self.ft_method} ' + '='*30) 
-            
-        # zeroshot accuracy
-        print(f'\nEvaluating Zeroshot Accuracy...')
-        zeroshot_accuracy = evaluate(model=self.model, 
-                                    data_loader=self.dataset.test_loader)
-        print(f'Zeroshot Accuracy: {100 * zeroshot_accuracy:.2f}%')
-        sys.stdout.flush()
         
         # finetuning layerscale
         meters = {
@@ -94,9 +87,7 @@ class FinetuningExperiment(Experiment):
         self.model.save_params(self.results_path + '/model_params.pt')
         
         # save results to CSV
-        stats = {'zeroshot_accuracy': zeroshot_accuracy,
-                 'final_test_accuracy': test_accuracy}
-        
+        stats = {'accuracy': test_accuracy}
         stats = dict(stats, **self.__getstate__())
         stats = dict(stats, **nc_dict)
         
