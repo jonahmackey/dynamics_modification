@@ -39,7 +39,7 @@ class FinetuningExperiment(Experiment):
                                    steps=self.num_epochs * num_batches)
     
     def run(self):
-        print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name} | FT METHOD {self.ft_method} ' + '='*30) 
+        print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name} | FT Method: {self.ft_method} ' + '='*30) 
         
         # finetuning layerscale
         meters = {
@@ -91,8 +91,9 @@ class FinetuningExperiment(Experiment):
         stats = dict(stats, **self.__getstate__())
         stats = dict(stats, **nc_dict)
         
+        print(f'\nSaving results to {self.results_path}/results.csv')
         with open(f'{self.results_path}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
             writer.writerow(stats)
-        print(f'\nSaved Results to {self.results_path}/results.csv')
+        

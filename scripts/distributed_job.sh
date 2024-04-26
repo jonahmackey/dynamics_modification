@@ -6,7 +6,7 @@
 #SBATCH --gpus-per-node=v100:2
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=16G
-#SBATCH --time=0-00:30
+#SBATCH --time=0-03:00
 
 MODEL_NAME=$1
 DATASET_NAME=$2
@@ -27,11 +27,12 @@ python /home/jmackey/scratch/dynamics_modification/main_dist.py \
     --data_path /home/jmackey/datasets \
     --lr ${LR} \
     --batch_size 128 \
-    --num_iters 1000 \
+    --num_iters 3000 \
     --warmup_steps 200 \
+    --weight_decay 0.0 \
     --print_every 100 \
     --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
-    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD_}lr=${LR}_id=${SLURM_JOB_ID}" \
+    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}" \
-    --world_size 2
+    --world_size 2 

@@ -42,6 +42,7 @@ if __name__ == '__main__':
         'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
         'job_id': parsed_args.job_id,
+        'world_size': parsed_args.world_size,
     }
     
     # run experiment

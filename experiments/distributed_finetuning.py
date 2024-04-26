@@ -15,13 +15,14 @@ from src.finetune import finetune_epoch
 from src.utils import cosine_lr, AverageMeter, AccuracyMeter
 from src.modeling import ImageClassifier, get_classification_head
 from src.datasets.registry import get_dataset
+from src.neural_collapse import compute_neural_collapse
 
 
 def run_experiment(rank, args):
     torch.cuda.set_device(rank)
     
     # init process group
-    print(f'From Rank: {rank} ==> Initializing Process Group...')
+    print(f'From Rank {rank} ==> Initializing Process Group...')
     setup_processes(world_size=args['world_size'], rank=rank)
     print('Process group ready!')
     sys.stdout.flush()
@@ -45,7 +46,7 @@ def run_experiment(rank, args):
     loss_func = nn.CrossEntropyLoss()
         
     params = [p for p in model.module.parameters() if p.requires_grad]
-    optimizer = optim.AdamW(params, lr=args['lr'])
+    optimizer = optim.AdamW(params, lr=args['lr'], weight_decay=args['weight_decay'])
         
     num_batches = len(dataset.train_loader)
     scheduler = cosine_lr(optimizer=optimizer, 
@@ -54,15 +55,15 @@ def run_experiment(rank, args):
                           steps=num_epochs * num_batches)
     
     ### Fine-tuning Loop ###
-    print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {args["model_name"]} | Dataset: {args["dataset_name"]}' + '='*30) 
-        
+    print('\n'+'='*30 + f' Fine-tuning LayerScale (Rank {rank}) | Model: {args["model_name"]} | Dataset: {args["dataset_name"]} | FT Method: {args["ft_method"]} ' + '='*30) 
+            
     # finetuning
     meters = {
         'loss': AverageMeter(),
         'accuracy': AccuracyMeter(),
     }
         
-    print(f'\nFine-tuning LayerScale...')
+    print(f'\nFine-tuning LayerScale... (Rank {rank})')
     for epoch in range(1, num_epochs + 1):
         
         dataset.train_loader.sampler.set_epoch(epoch)
@@ -80,8 +81,8 @@ def run_experiment(rank, args):
                                                     print_every=args['print_every'])
         
     
-        print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{num_epochs}')
-        print(f'Fine-tuning Epoch Accuracy: {epoch_accuracy:.2f} | Epoch: {epoch}/{num_epochs}')
+        print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{num_epochs} (Rank {rank})')
+        print(f'Fine-tuning Epoch Accuracy: {epoch_accuracy:.2f} | Epoch: {epoch}/{num_epochs} (Rank {rank})')
             
             # evaluation 
         if rank == 0:
@@ -91,32 +92,39 @@ def run_experiment(rank, args):
                 
             print(f'Test Accuracy: {100 * test_accuracy:.2f}% | Epoch: {epoch}/{num_epochs}\n')
             sys.stdout.flush()
-            
         dist.barrier()
         
     # saving results
     if rank == 0:
+        # compute finetuned NC statistics
+        print(f'Computing Fine-tuned NC Statistics...')
+        Sw_invSb = compute_neural_collapse(image_encoder=model.module.image_encoder, 
+                                           data_loader=dataset.test_loader, 
+                                           num_classes=len(dataset.classnames))
+        print(f'Done Computing Fine-tuned NC Statistics\n')
+        sys.stdout.flush()
+        
+        nc_dict = {f'Sw_invSb {i + 1}': Sw_invSb[i] for i in range(len(Sw_invSb))}
+        
         # save gammas 
         model.module.save_params(args['results_path'] + '/model_params.pt')
         
         # save results to CSV
         stats = {'accuracy': test_accuracy}
         stats = dict(stats, **args)
+        stats = dict(stats, **nc_dict)
         
+        print(f'\nSaving results to {args["results_path"]}/results.csv')
         with open(f'{args["results_path"]}/results.csv', 'w', newline='') as file:
             writer = csv.DictWriter(file, fieldnames=stats.keys())
             writer.writeheader()
             writer.writerow(stats)
-        print(f'\nSaved Results to {args["results_path"]}/results.csv')
         
-    dist.barrier()
+    # dist.barrier()
     dist.destroy_process_group()
     
     
 def setup_processes(world_size, rank):
-    print("Rank: ", rank)
-    print("World Size: ", world_size)
-    
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
     
