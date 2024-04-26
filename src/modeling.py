@@ -39,9 +39,10 @@ class ImageClassifier(torch.nn.Module):
         self.preprocess = preprocess
         self.ft_method = ft_method
         
-        if not (ft_method == 'full'):
-            self.init_ls()
-        self.freeze_param_subset()
+        if not (ft_method == 'zeroshot'):
+            if not (ft_method == 'full'):
+                self.init_ls()
+            self.freeze_param_subset()
         
     def init_ls(self):
         embed_dim = self.image_encoder.transformer.width

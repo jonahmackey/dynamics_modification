@@ -54,10 +54,9 @@ def run_experiment(rank, args):
                           warmup_length=args['warmup_steps'], 
                           steps=num_epochs * num_batches)
     
-    ### Fine-tuning Loop ###
-    print('\n'+'='*30 + f' Fine-tuning LayerScale (Rank {rank}) | Model: {args["model_name"]} | Dataset: {args["dataset_name"]} | FT Method: {args["ft_method"]} ' + '='*30) 
-            
-    # finetuning
+    print('\n'+'='*30 + f' Running Experiment (Rank {rank}) | Model: {args["model_name"]} | Dataset: {args["dataset_name"]} | FT Method: {args["ft_method"]} ' + '='*30) 
+      
+    ### Fine-tuning Loop ###      
     meters = {
         'loss': AverageMeter(),
         'accuracy': AccuracyMeter(),

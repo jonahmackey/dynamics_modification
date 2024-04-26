@@ -21,7 +21,8 @@ class FinetuningExperiment(Experiment):
         
         self.model.cuda()
         
-        self.setup_optimization()
+        if not (self.ft_method == 'zeroshot'):
+            self.setup_optimization()
         
     def setup_optimization(self):
         # loss
@@ -39,52 +40,68 @@ class FinetuningExperiment(Experiment):
                                    steps=self.num_epochs * num_batches)
     
     def run(self):
-        print('\n'+'='*30 + f' Fine-tuning LayerScale | Model: {self.model_name} | Dataset: {self.dataset_name} | FT Method: {self.ft_method} ' + '='*30) 
+        print('\n'+'='*30 + f' Running Experiment | Model: {self.model_name} | Dataset: {self.dataset_name} | FT Method: {self.ft_method} ' + '='*30) 
         
-        # finetuning layerscale
-        meters = {
-            'loss': AverageMeter(),
-            'accuracy': AccuracyMeter(),
-        }
-        
-        print(f'\nFine-tuning LayerScale...')
-        for epoch in range(1, self.num_epochs + 1):
-        
-            # finetuning epoch
-            epoch_loss, epoch_accuracy = finetune_epoch(model=self.model,
-                                                        data_loader=self.dataset.train_loader,
-                                                        loss_fn=self.loss_func,
-                                                        optimizer=self.optimizer,
-                                                        scheduler=self.scheduler,
-                                                        meters=meters,
-                                                        epoch=epoch,
-                                                        num_epochs=self.num_epochs,
-                                                        clip_grad_norm=self.clip_grad_norm,
-                                                        print_every=self.print_every)
+        if not (self.ft_method == 'zeroshot'):
+            ### Fine-tuning Loop ###
+            meters = {
+                'loss': AverageMeter(),
+                'accuracy': AccuracyMeter(),
+            }
             
-        
-            print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{self.num_epochs}')
-            print(f'Fine-tuning Epoch Accuracy: {epoch_accuracy:.2f} | Epoch: {epoch}/{self.num_epochs}')
+            print(f'\nFine-tuning LayerScale...')
+            for epoch in range(1, self.num_epochs + 1):
             
-            # evaluation 
-            print(f'\nEvaluating...')
-            test_accuracy = evaluate(model=self.model, data_loader=self.dataset.test_loader)
+                # finetuning epoch
+                epoch_loss, epoch_accuracy = finetune_epoch(model=self.model,
+                                                            data_loader=self.dataset.train_loader,
+                                                            loss_fn=self.loss_func,
+                                                            optimizer=self.optimizer,
+                                                            scheduler=self.scheduler,
+                                                            meters=meters,
+                                                            epoch=epoch,
+                                                            num_epochs=self.num_epochs,
+                                                            clip_grad_norm=self.clip_grad_norm,
+                                                            print_every=self.print_every)
                 
-            print(f'Test Accuracy: {100 * test_accuracy:.2f}% | Epoch: {epoch}/{self.num_epochs}\n')
+            
+                print(f'Fine-tuning Epoch Loss: {epoch_loss:.6f} | Epoch: {epoch}/{self.num_epochs}')
+                print(f'Fine-tuning Epoch Accuracy: {epoch_accuracy:.2f} | Epoch: {epoch}/{self.num_epochs}')
+                
+                # evaluation 
+                print(f'\nEvaluating...')
+                test_accuracy = evaluate(model=self.model, data_loader=self.dataset.test_loader)
+                    
+                print(f'Test Accuracy: {100 * test_accuracy:.2f}% | Epoch: {epoch}/{self.num_epochs}\n')
+                sys.stdout.flush()
+        else:
+            print(f'\nEvaluating Zeroshot...')
+            test_accuracy = evaluate(model=self.model, data_loader=self.dataset.test_loader)
+            print(f'Zeroshot Accuracy: {100 * test_accuracy:.2f}%\n')
             sys.stdout.flush()
+            
+            # manually setting attributes to None 
+            self.lr = None
+            self.num_iters = None
+            self.warmup_steps = None
+            self.num_epochs = None 
+            self.weight_decay = None
+            self.clip_grad_norm = None
+            self.print_every = None
         
-        # compute finetuned NC statistics
-        print(f'Computing Fine-tuned NC Statistics...')
+        # compute NC statistics
+        print(f'Computing NC Statistics...')
         Sw_invSb = compute_neural_collapse(image_encoder=self.model.image_encoder, 
                                            data_loader=self.dataset.test_loader, 
                                            num_classes=len(self.dataset.classnames))
-        print(f'Done Computing Fine-tuned NC Statistics\n')
+        print(f'Done Computing NC Statistics\n')
         sys.stdout.flush()
         
         nc_dict = {f'Sw_invSb {i + 1}': Sw_invSb[i] for i in range(len(Sw_invSb))}
         
         # save model params
-        self.model.save_params(self.results_path + '/model_params.pt')
+        if not (self.ft_method == 'zeroshot'):
+            self.model.save_params(self.results_path + '/model_params.pt')
         
         # save results to CSV
         stats = {'accuracy': test_accuracy}
