@@ -22,7 +22,9 @@ if __name__ == '__main__':
     parser.add_argument('--ft_method', default='ls_gamma', type=str)
     parser.add_argument('--heads_path', default='./heads', type=str)
     parser.add_argument('--results_path', default='./results', type=str)
+    parser.add_argument('--local_path', default='', type=str)
     parser.add_argument("--job_id", default='', type=str)
+    parser.add_argument("--world_size", default=1, type=int)
     
     parsed_args = parser.parse_args()
     
@@ -41,6 +43,7 @@ if __name__ == '__main__':
         'ft_method': parsed_args.ft_method,
         'heads_path': parsed_args.heads_path + f'/{parsed_args.model_name}',
         'results_path': parsed_args.results_path,
+        'local_path': parsed_args.local_path,
         'job_id': parsed_args.job_id,
         'world_size': parsed_args.world_size,
     }

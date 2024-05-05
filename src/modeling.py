@@ -12,6 +12,8 @@ ft_method_to_key = {
     'ln-ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta', 'ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
     'ls': ['ls_1.gamma', 'ls_2.gamma', 'ls_1.beta', 'ls_2.beta'],
     'ls-gamma': ['ls_1.gamma', 'ls_2.gamma'],
+    'ls-gamma1': ['ls_1.gamma'],
+    'ls-gamma2': ['ls_2.gamma'],
     'ls-beta': ['ls_1.beta', 'ls_2.beta'],
     'ln': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight', 'ln_pre.bias', 'ln_1.bias', 'ln_2.bias', 'ln_post.bias'],
     'ln-weight': ['ln_pre.weight', 'ln_1.weight', 'ln_2.weight', 'ln_post.weight'],

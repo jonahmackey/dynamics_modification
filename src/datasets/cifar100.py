@@ -1,5 +1,9 @@
+import os 
+
 import torch
 import torchvision.datasets as datasets
+from torchvision.datasets.utils import download_and_extract_archive
+
 from src.datasets.classnames import get_classnames
 
 
@@ -10,10 +14,14 @@ class CIFAR100:
                  batch_size=128,
                  distributed=False):
         
-        location = location + '/CIFAR100'
+        self.location = location + '/CIFAR100'
+        
+        if not os.path.exists(self.location):
+            print(f"Dataset not found at {self.location}. Downloading...")
+            self.download()
         
         self.test_dataset = datasets.CIFAR100(
-            root=location,
+            root=self.location,
             download=False,
             train=False,
             transform=preprocess
@@ -27,7 +35,7 @@ class CIFAR100:
             )
         
         self.train_dataset = datasets.CIFAR100(
-            root=location,
+            root=self.location,
             download=False,
             train=True,
             transform=preprocess
@@ -49,3 +57,10 @@ class CIFAR100:
         )
 
         self.classnames = get_classnames('CIFAR100')
+        
+    def download(self):
+        url = "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
+        filename = "cifar-100-python.tar.gz"
+        tgz_md5 = "eb9058c3a382ffc7106e4002c42a8d85"
+        
+        download_and_extract_archive(url, self.location, filename=filename, md5=tgz_md5)
