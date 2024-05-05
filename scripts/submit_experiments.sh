@@ -5,10 +5,10 @@ EXPERIMENT_TITLE=$1
 echo "Creating experiment directory /home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 mkdir "/home/jmackey/scratch/dynamics_modification/results/${EXPERIMENT_TITLE}"
 
-MODEL_NAMES=( "ViT-B-32" "ViT-B-16" )
+MODEL_NAMES=( "ViT-B-32" )
 DATASET_NAMES=( "MNIST" "SVHN" "CIFAR10" "CIFAR100" )
-LR_VALS=( 1e-5 )
-FT_METHODS=( "full" )
+LR_VALS=( 0.01 )
+FT_METHODS=( "ls-gamma1" "ls-gamma2" )
 
 for MODEL_NAME in "${MODEL_NAMES[@]}";
 do

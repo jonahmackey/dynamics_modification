@@ -25,12 +25,12 @@ python /home/jmackey/scratch/dynamics_modification/main.py \
     --data_path /home/jmackey/scratch/dynamics_modification/datasets \
     --lr ${LR} \
     --batch_size 128 \
-    --num_iters 2000 \
+    --num_iters 3000 \
     --warmup_steps 200 \
-    --weight_decay 0.1 \
-    --clip_grad_norm \
+    --weight_decay 0.0 \
     --print_every 100 \
     --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
     --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}" \
+    --local_path "${SLURM_TMPDIR}" \
     --job_id "${SLURM_JOB_ID}"
