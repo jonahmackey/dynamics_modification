@@ -12,7 +12,7 @@ LR=$3
 FT_METHOD=$4
 RESULTS_PATH=$5
 
-mkdir "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}"
+mkdir "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_id=${SLURM_JOB_ID}"
 module load python/3.10
 module load scipy-stack
 source /home/jmackey/dm/bin/activate
@@ -32,5 +32,5 @@ python /home/jmackey/scratch/dynamics_modification/main.py \
     --print_every 100 \
     --ft_method ${FT_METHOD} \
     --heads_path /home/jmackey/scratch/dynamics_modification/heads \
-    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_lr=${LR}_id=${SLURM_JOB_ID}" \
+    --results_path "${RESULTS_PATH}/${MODEL_NAME}_${DATASET_NAME}_${FT_METHOD}_id=${SLURM_JOB_ID}" \
     --job_id "${SLURM_JOB_ID}"
